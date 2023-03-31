@@ -1,16 +1,26 @@
-use std::{collections::HashSet};
+use std::{collections::HashSet, ops::Sub};
 use crate::{clause::{Clause, ClauseRightItem}, request::{Request, RequestItem}, 
             atom::Atom, substitution::Substitution, term::Term, unification::mgu, 
             variable::Variable, program::Program, configuration::Configuration};
 
+
+
+/*
+Return a new clause "c'" that is identical to 'c', except that all variables in c'
+are renamed to fresh variables that are not in forbiddenVars.
+Works recursively by iterating through all variables in c and checking if they are in forbiddenVars.
+The function calls itself recursively on the new clause with the same set.
+
+
+*/
 fn rename(c: &Clause, forbiddenVars: HashSet<Variable>) -> Clause {
     // retourne une clause c' identique à la clause c, à renommage près,
     // de sorte que c' n'a aucune variable dans l'ensemble de variables "interdites"
     for v in c.variables().iter() {
         if forbiddenVars.contains(v) {
             let mut i = 1;
-            let mut v2 = v.with_variant(i);
-            while forbiddenVars.contains(&v2) { 
+            let mut v2 = v.with_variant(i); // call the Variable function
+            while forbiddenVars.contains(&v2) { // if the new variant is in the set btw, we increment by one more variant
                 i += 1;
                 v2 = v.with_variant(i)
             };
@@ -21,12 +31,22 @@ fn rename(c: &Clause, forbiddenVars: HashSet<Variable>) -> Clause {
     c.clone()
 }
 
+
 fn resolve(goal:&Atom, clause:&Clause) -> Option<(Substitution, Vec<ClauseRightItem>)> {
     // essaie de déduire le but en applicant la clause avec une substitution la plus générale possible
     // renvoie la substitution la plus générale ainsi que les premisses de la clause après application de 
     // la substitution si c'est possible, None sinon
-    todo!()
+    
+    let unifier = mgu(&goal, &clause.goal)?;
+    
+    let new_caluse = Substitution::apply_to_clause(&unifier, clause);
+    let premises = new_caluse.premises.clone();
+    
+    Some((unifier, premises))
 }
+
+
+
 
 fn search_step(mut conf: Configuration, program:&Program) -> Vec<Configuration> {
     // prend une configuration avec une requête contenant au moins un but et un programme

@@ -2,6 +2,7 @@ use std::{fmt::Display, collections::HashSet};
 use crate::{atom::Atom, variable::Variable};
 
 #[derive(Debug, PartialEq)]
+
 pub enum RequestItem {
     Atom(Atom),
     Cut(usize)
@@ -30,7 +31,7 @@ pub struct Request {
     // Une requête =  une liste d'atomes ou de coupures avec des numéros sur les coupures
     // On utilise Vec comme une pile, donc on liste en partant de la fin.
     // ex: la requête `:- a,b,c` sera représentée par `Request{goals:vec![c,b,a]}`
-    pub goals: Vec<RequestItem>,
+    pub goals: Vec<RequestItem>, // can be an atom or cut
 }
 
 impl Request {

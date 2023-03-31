@@ -7,13 +7,18 @@ pub struct Substitution {
 }
 
 /*
-Le resultat d'un programme Prolog est un ensemble de substitutions
+
+Le resultat d'un programme Datalog est un ensemble de substitutions
+a une variable - la substitution associe un terme
+
+On remplace chaque variable du domaine de la substitution par le terme associe.
+Les autres variables restent inchangees.
 
 */
 
 
 
-impl Substitution { // methodes de l'objet 
+impl Substitution  { // methodes de l'objet 
     
     pub fn identity() -> Self {
         // la substitution identité, notée [] dans le cours
@@ -25,6 +30,7 @@ impl Substitution { // methodes de l'objet
     
     pub fn substitution(x: Variable, t: Term) -> Self {
         // la substitution [X <- t]
+        // representee par une HashMap qui a une variable associe un terme.
         let mut res = Self::identity();
         res.bindings.insert(x, t);
         res
@@ -41,34 +47,54 @@ impl Substitution { // methodes de l'objet
     }
 
 
+
+
+
     pub fn apply_to_term(sigma: &Self, t: &Term) -> Term {
         // le résultat de l'application de la substitution au terme
         // si t=X et sigma = [X <- t', ...] alors t sigma = X[ X<- t', ...] = t'
         // si t=Y et Y n'est pas dans dom(sigma) alors t sigma = t = Y 
         // si t=c, alors t sigma = c sigma = c
+
+        // term c'est soit une constante, soit une variable
+        // donc pattern-matching
+
         match t {
-            Term::Variable(x) => {
+            Term::Variable(x) => { // if we have a variable that is replaced by another one we'll call this function in a recursive way
                 if let Some(v) = sigma.bindings.get(x) {
                     Substitution::apply_to_term(sigma, v)
                 } else {
                     t.clone()
                 }
             },
+            
             Term::Constant(_) => t.clone(),
         }
     }
 
 
 
+
+
     pub fn apply_to_atom(sigma: &Self, atom: &Atom) -> Atom {
+        // applies the given substitution sigma to an atom and return the resulting atom.
         // ce que l'on a noté Aσ dans le cours
-        let new_predicate = atom.predicate.clone();
-        let new_terms = atom.args.iter().map(|t| Self::apply_to_term(sigma, t)).collect();
-        Atom {
+        
+        // On peut appliquer une substitution à un atome: on remplace chaque variable du 
+        // domaine de la substitution par le terme associé. 
+        // Les autres variables restent inchangées.
+
+
+        let new_predicate = atom.predicate.clone(); // le predicate reste le meme
+        let new_terms = atom.args.iter().map(|t| Self::apply_to_term(sigma, t)).collect(); // pour chaque term t on fait un appel au fonction apply_to_term
+        
+        Atom { // return the result atom
             predicate: new_predicate,
             args: new_terms,
         }
     }
+
+
 
     pub fn apply_to_clause_item(subst: &Self, clause_item: &ClauseRightItem) -> ClauseRightItem {
         // applique la substitution a un élément de partie droite de clause
@@ -76,12 +102,14 @@ impl Substitution { // methodes de l'objet
             ClauseRightItem::Atom(a) => ClauseRightItem::Atom(Substitution::apply_to_atom(subst, a)),
             ClauseRightItem::Cut => ClauseRightItem::Cut,
         }
+
+
     }
 
 
     pub fn apply_to_clause(subst: &Self, clause: &Clause) -> Clause {
         // applique la substitution à une clause
-        let mut new_premises = Vec::new();
+        let mut new_premises = Vec::new(); // creation d'un nouveau vecteur qui va contenir les nouveaux premises
         for p in &clause.premises {
             new_premises.push(Substitution::apply_to_clause_item(subst, p));
         };
@@ -93,9 +121,6 @@ impl Substitution { // methodes de l'objet
     }
 
 
-
-
-
     pub fn apply_to_request_item(subst: &Self, clause_item: &RequestItem) -> RequestItem {
         // applique la subtitution à un item droit de requête
         match clause_item {
@@ -105,13 +130,18 @@ impl Substitution { // methodes de l'objet
         
     }
 
+
+
     pub fn apply_to_request(subst: &Self, request: &Request) -> Request  {
         // applique la substitution à une requête
-        let new_goals = request.goals.iter().map(|g| Substitution::apply_to_request_item(subst,g)).collect();
+        // pour chaque element du vecteur goals on applique la fonction apply_to_request_item
+        // on sait qu'il s'agit des elements RequestItem dans le vecteur
+        let new_goals = request.goals.iter().map(|g| Substitution::apply_to_request_item(subst,g)).collect(); 
         Request { goals: new_goals }
     }
 
-
+    // Applying the first map to each variable in the second map
+    // return a new map that will combine the results
     pub fn compose(subst1: &Self, subst2: &Self) -> Self {
         let mut res = subst2.clone();
         for v in subst1.domain() {

@@ -1,6 +1,6 @@
-c:\Users\negru\OneDrive\Bureau\uni\S6\Paradigmes\part1\cours3\Datalog\target\debug\deps\Datalog-b0281c87c2f28f9c.rmeta: src\main.rs src\constant.rs src\variable.rs src\predicate.rs src\term.rs src\atom.rs src\clause.rs src\request.rs src\substitution.rs src\unification.rs src\search.rs src\program.rs src\configuration.rs
+c:\Users\negru\OneDrive\Bureau\GIT\stuff\DataLog\target\debug\deps\Datalog-b0281c87c2f28f9c.rmeta: src\main.rs src\constant.rs src\variable.rs src\predicate.rs src\term.rs src\atom.rs src\clause.rs src\request.rs src\substitution.rs src\unification.rs src\search.rs src\program.rs src\configuration.rs
 
-c:\Users\negru\OneDrive\Bureau\uni\S6\Paradigmes\part1\cours3\Datalog\target\debug\deps\Datalog-b0281c87c2f28f9c.d: src\main.rs src\constant.rs src\variable.rs src\predicate.rs src\term.rs src\atom.rs src\clause.rs src\request.rs src\substitution.rs src\unification.rs src\search.rs src\program.rs src\configuration.rs
+c:\Users\negru\OneDrive\Bureau\GIT\stuff\DataLog\target\debug\deps\Datalog-b0281c87c2f28f9c.d: src\main.rs src\constant.rs src\variable.rs src\predicate.rs src\term.rs src\atom.rs src\clause.rs src\request.rs src\substitution.rs src\unification.rs src\search.rs src\program.rs src\configuration.rs
 
 src\main.rs:
 src\constant.rs:

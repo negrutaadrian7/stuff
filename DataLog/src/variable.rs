@@ -2,8 +2,8 @@ use std::fmt::Display;
 
 #[derive(Clone, Eq, Hash, PartialEq, Debug)]
 pub struct Variable {
-    identifier: String,
-    variant: usize
+    pub identifier: String,
+    pub variant: usize
 }
 
 impl Variable {

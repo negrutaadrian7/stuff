@@ -11,9 +11,10 @@ use crate::{atom::Atom, variable::Variable};
 
 #[derive(Clone, Debug, PartialEq)]
 
-pub enum ClauseRightItem {
+//mortel(socrate) :- .
+pub enum ClauseRightItem { // partie droite
     Atom(Atom),
-    Cut
+    Cut // la coupure; note "!" - sert a couper des branches de l'arbre de recherche
 }
 
 impl ClauseRightItem {
@@ -21,7 +22,7 @@ impl ClauseRightItem {
         // l'ensemble des variables d'un item de clause
         match self {
             ClauseRightItem::Atom(a) => a.variables(),
-            ClauseRightItem::Cut => HashSet::new(),
+            ClauseRightItem::Cut => HashSet::new(), // retorne l'ensemble vide
         }
     }
 }
@@ -39,9 +40,10 @@ impl Display for ClauseRightItem {
 
 pub struct Clause {
     // Une clause positive: peut être un fait (si pas de prémisses) ou une règle
-    pub goal: Atom,
-    pub premises: Vec<ClauseRightItem>
+    pub goal: Atom, // partie gauche
+    pub premises: Vec<ClauseRightItem> // hypothese necessaires pour appliquer une regle, partie droite
 }
+
 
 impl Clause {
     pub fn variables(&self) -> HashSet<Variable> {

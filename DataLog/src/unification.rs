@@ -1,9 +1,48 @@
+use std::ops::Sub;
+
 use crate::{term::Term, variable::Variable, atom::Atom, substitution::Substitution};
+
+pub fn unify(term1: &Term, term2: &Term) -> Option<Substitution> {
+    match (term1, term2) {
+        // If the two terms are constants or the same variable, they unify trivially
+        (Term::Constant(c1), Term::Constant(c2)) if c1 == c2 => Some(Substitution::identity()),
+        (Term::Variable(v1), Term::Variable(v2)) if v1 == v2 => Some(Substitution::identity()),
+
+        // If one of the terms is a variable, unify it with the other term
+        (Term::Variable(v), t) => Some(Substitution::substitution(v.clone(), t.clone())),
+
+        (t, Term::Variable(v)) => Some(Substitution::substitution(v.clone(), t.clone())),
+
+        // If the two terms have different constants, they cannot unify
+        (Term::Constant(_), _) | (_, Term::Constant(_)) => None,
+
+        // If the two terms are variables with different identifiers, they cannot unify
+        (Term::Variable(v1), Term::Variable(v2)) if v1.identifier != v2.identifier => None,
+
+        // If the two terms are variables with the same identifier, they unify trivially
+        (Term::Variable(_), _) | (_, Term::Variable(_)) => Some(Substitution::identity()),
+    }
+}
+
+
+
 
 pub fn mgu(atom1: &Atom, atom2: &Atom) -> Option<Substitution> {
     // renvoie l'unificateur le plus général des deux atomes, s'il existe, sinon None
-    todo!()
+    if atom1.predicate != atom2.predicate {
+        return None;
+    }
+    let mut sigma = Substitution::identity();
+
+    for (arg1, arg2) in atom1.args.iter().zip(atom2.args.iter()){ // will return pairs made of (arg1, arg2) from the 2 vectors
+        let sigma_prime = unify(&Substitution::apply_to_term(&sigma, arg1), &Substitution::apply_to_term(&sigma, arg2))?;
+        sigma = Substitution::compose(&sigma, &sigma_prime);
+    }
+    
+    Some(sigma)
 }
+
+
 
 #[cfg(test)]
 mod tests {
