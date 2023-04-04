@@ -117,7 +117,7 @@ fn search_step(mut conf: Configuration, program:&Program) -> Vec<Configuration> 
                 }
             }
         },
-        RequestItem::Cut(_) => vec![],
+        RequestItem::Cut(_) => vec![], // ?
     }
 }
     
@@ -132,19 +132,24 @@ fn search_next_solution(stack: &mut Vec<Configuration>, program: &Program)
     // - ou bien la configuration en haut du tas contient une requête vide:
     //   une solution a été trouvée, on la renvoie
     // - ou bien la pile est vide: aucune solution n'a pu être trouvé, on renvoie None
+    
     while let Some(conf) = stack.pop() {
         let res = search_step(conf, program);
-        for c in res {
-            stack.push(c);
+        for c in res { // cherche une solution en partant de a configuration en haut de la pile
+            stack.push(c); // empile les configurations produites par un petit pas
         }
         if let Request { goals, .. } = &stack.last().unwrap().request {
-            if goals.is_empty() {
+            if goals.is_empty() { // la configuration en haut du tas contient une requete vide
                 return Some(stack.last().unwrap().substitution.clone());
             }
         }
     }
-    None
+    None // si la pile est vide, aucune solution 
 }
+
+
+
+
 
 
 #[cfg(test)]
