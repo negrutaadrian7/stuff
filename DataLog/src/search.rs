@@ -13,6 +13,7 @@ The function calls itself recursively on the new clause with the same set.
 
 
 */
+
 fn rename(c: &Clause, forbiddenVars: HashSet<Variable>) -> Clause {
     // retourne une clause c' identique à la clause c, à renommage près,
     // de sorte que c' n'a aucune variable dans l'ensemble de variables "interdites"
@@ -59,21 +60,69 @@ fn search_step(mut conf: Configuration, program:&Program) -> Vec<Configuration> 
     //  - si la résolution échoue, on renvoie la configuration initiale avec le PC incrémenté de 1
     //  - sinon on renvoie la configuration initiale avec le PC incrémenté de 1 ainsi que la configuration
     //    obtenue en réécrivant la requête, avec la substitution augmentée du mgu calculé, et un PC à 0
-    if conf.program_counter >= program.clauses.len() { return vec![] };
+    
+    if conf.program_counter >= program.clauses.len() {
+        // if the program counter has exceeded the number of clauses in the program, we are done searching
+        return vec![];
+    }
+        
     let clause = rename(&program.clauses[conf.program_counter], conf.request.variables());
     conf.program_counter += 1;
+        
     match conf.request.goals.last().unwrap() {
         RequestItem::Atom(goal) => {
             match resolve(&goal, &clause) {
-                None => { todo!() },
+                None => {
+                    vec![Configuration { request: conf.request, substitution: conf.substitution, program_counter: conf.program_counter }]
+                },
                 Some((sigma, mut reqitems)) => {
-                    todo!() // environ 20 lignes
+                    match reqitems.pop().unwrap() {
+                        ClauseRightItem::Atom(curr) => {
+                            let updated_goal = Substitution::apply_to_atom(&sigma, &curr);
+                            let updated_substitution = Substitution::compose(&sigma, &conf.substitution);
+                                
+                            let updated_request = Request {
+                                goals: reqitems.iter().map(|r| {
+                                    match r {
+                                        ClauseRightItem::Atom(a) => RequestItem::Atom(Substitution::apply_to_atom(&updated_substitution, &a)),
+                                        ClauseRightItem::Cut => RequestItem::Cut(0),
+                                    }
+                                }).collect(),
+                            };
+                                
+                            let mut results = vec![];
+                                
+                            if updated_request.goals.is_empty() {
+                                results.push(Configuration { request: updated_request.clone(), substitution: updated_substitution.clone(), program_counter: 0 });
+                            } else {
+                                let updated_conf = Configuration { request: updated_request.clone(), substitution: updated_substitution.clone(), program_counter: 0 };
+                                results.push(updated_conf);
+                            }
+                                
+                            let updated_clause = Substitution::apply_to_clause(&updated_substitution, &clause);
+                            let conf_with_updated_clause = Configuration { request: Request { goals: vec![RequestItem::Atom(updated_goal)] }, substitution: updated_substitution.clone(), program_counter: 0 };
+                            results.push(conf_with_updated_clause);
+                                
+                            if updated_request.goals.is_empty() {
+                                results.push(Configuration { request: updated_request.clone(), substitution: updated_substitution.clone(), program_counter: 0 });
+                            } else {
+                                let conf_with_updated_subst = Configuration { request: updated_request.clone(), substitution: updated_substitution.clone(), program_counter: conf.program_counter };
+                                results.push(conf_with_updated_subst);
+                            }
+                                
+                            results
+                        },
+                        _ => vec![],
+                    }
                 }
             }
         },
-        RequestItem::Cut(i) => todo!(), // à faire au TP 4
+        RequestItem::Cut(_) => vec![],
     }
 }
+    
+    
+
 
 fn search_next_solution(stack: &mut Vec<Configuration>, program: &Program) 
     -> Option<Substitution> {
@@ -83,7 +132,18 @@ fn search_next_solution(stack: &mut Vec<Configuration>, program: &Program)
     // - ou bien la configuration en haut du tas contient une requête vide:
     //   une solution a été trouvée, on la renvoie
     // - ou bien la pile est vide: aucune solution n'a pu être trouvé, on renvoie None
-    todo!()
+    while let Some(conf) = stack.pop() {
+        let res = search_step(conf, program);
+        for c in res {
+            stack.push(c);
+        }
+        if let Request { goals, .. } = &stack.last().unwrap().request {
+            if goals.is_empty() {
+                return Some(stack.last().unwrap().substitution.clone());
+            }
+        }
+    }
+    None
 }
 
 

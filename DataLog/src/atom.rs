@@ -27,6 +27,14 @@ Les regles:
 
 
 impl Atom {
+    
+    pub fn new(predicate: &str, args: Vec<Term>) -> Atom { // for the tests
+        Atom {
+            predicate: predicate.to_string(),
+            args,
+        }
+    }
+    
     pub fn variables(&self) -> HashSet<Variable> {
         // renvoie l'ensemble des variables d'un atome
         let mut res = HashSet::new();

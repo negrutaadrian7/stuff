@@ -175,7 +175,7 @@ impl Display for Substitution {
 #[cfg(test)]
 mod tests {
 
-    use crate::{substitution::Substitution, variable::Variable, term::Term, constant::Constant};
+    use crate::{substitution::Substitution, variable::Variable, term::Term, constant::Constant, atom::Atom, clause::{Clause, ClauseRightItem}, request::{Request, RequestItem}};
 
     #[test]
     fn test_apply_to_term() {
@@ -188,20 +188,62 @@ mod tests {
 
     #[test]
     fn test_apply_to_atom() {
-        // écrivez votre test ici
-        todo!()
+        let c = Term::Constant(Constant::Identifier("c".to_string()));
+        let x_1 = Variable::of_str("x");
+        let y_1 = Variable::of_str("y");
+        let z_1 = Variable::of_str("z");
+        let sigma = Substitution::substitution(x_1.clone(), c.clone());
+        let a = Atom::new("p", vec![Term::Variable(x_1.clone()), Term::Variable(y_1.clone()), Term::Variable(z_1.clone())]);
+        let res = Substitution::apply_to_atom(&sigma, &a);
+        assert_eq!(res, Atom::new("p", vec![c.clone(), Term::Variable(y_1.clone()), Term::Variable(z_1.clone())]));
+    
+        // Test with variables in the atom
+        let x_2 = Variable::of_str("x");
+        let w_2 = Variable::of_str("w");
+        let a2 = Atom::new("q", vec![Term::Variable(x_2.clone()), Term::Variable(w_2.clone())]);
+        let sigma2 = Substitution::substitution(x_2.clone(), c.clone());
+        let res2 = Substitution::apply_to_atom(&sigma2, &a2);
+        assert_eq!(res2, Atom::new("q", vec![c.clone(), Term::Variable(w_2.clone())]));
     }
+
+
 
     #[test]
     fn test_apply_to_clause() {
         // écrivez votre test ici
-        todo!()
+        let x_ = Variable::of_str("x");
+        let y_ = Variable::of_str("y");
+        let z_ = Variable::of_str("z");
+        let c = Term::Constant(Constant::Identifier("c".to_string()));
+        let d = Term::Constant(Constant::Identifier("d".to_string()));
+        let e = Term::Constant(Constant::Identifier("e".to_string()));
+        let a1 = Atom::new("p", vec![Term::Variable(x_.clone()), Term::Variable(y_.clone()), c.clone()]);
+        let a2 = Atom::new("q", vec![Term::Variable(y_.clone()), Term::Variable(z_)]);
+        let a3 = Atom::new("r", vec![c.clone(), d.clone()]);
+        let clause = Clause { goal: a1.clone(), premises: vec![ClauseRightItem::Atom(a2.clone()), ClauseRightItem::Atom(a3.clone())] };
+        let sigma = Substitution::substitution(y_.clone(), d.clone());
+        let res = Substitution::apply_to_clause(&sigma, &clause);
+        let expected_goal = Atom::new("p", vec![Term::Variable(x_.clone()), d.clone(), c.clone()]);
+        let expected_premises = vec![ClauseRightItem::Atom(Substitution::apply_to_atom(&sigma, &a2)), ClauseRightItem::Atom(Substitution::apply_to_atom(&sigma, &a3))];
+        let expected = Clause { goal: expected_goal, premises: expected_premises };
+        assert_eq!(res.premises, expected.premises);
     }
+
+
 
     #[test]
     fn test_apply_to_request() {
-        // écrivez votre test ici
-        todo!()
+        let x_ = Variable::of_str("x");
+        let c = Term::Constant(Constant::Identifier("c".to_string()));
+        let d = Term::Constant(Constant::Identifier("d".to_string()));
+        let a1 = Atom::new("p", vec![Term::Variable(x_), c.clone()]);
+        let a2 = Atom::new("q", vec![c.clone(), Term::Variable(Variable::of_str("z"))]); 
+        let request = Request{ goals: vec![RequestItem::Atom(a1.clone()), RequestItem::Atom(a2.clone())] };
+        let sigma = Substitution::substitution(Variable::of_str("z"), d.clone()); 
+        let res = Substitution::apply_to_request(&sigma, &request);
+        let expected_goals = vec![RequestItem::Atom(Substitution::apply_to_atom(&sigma, &a1)), RequestItem::Atom(Substitution::apply_to_atom(&sigma, &a2))];
+        let expected = Request{ goals: expected_goals };
+        assert_eq!(res, expected);
     }
 
 

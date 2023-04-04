@@ -1,7 +1,7 @@
 use std::{fmt::Display, collections::HashSet};
 use crate::{atom::Atom, variable::Variable};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 
 pub enum RequestItem {
     Atom(Atom),
@@ -26,7 +26,7 @@ impl RequestItem {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Request {
     // Une requête =  une liste d'atomes ou de coupures avec des numéros sur les coupures
     // On utilise Vec comme une pile, donc on liste en partant de la fin.
