@@ -1,23 +1,16 @@
 package tp05.complexe;
 
-// toate functiile vor fi implementate ulterior in clasele care vor implementa aceasta interfata
-
-//Une méthode par défaut permet de 
-//donner une implémentation dans une 
-//interface.
-//Cette implémentation peut faire appel à 
-//des méthodes qui seront définies plus 
-//tard dans les classes.
-
-
 public interface Complexe {
+    // all the methods that not contain the default keyword need to be implemented
+    // in the regular classes that will implement this interface
     double reelle();
+
     double imaginaire();
+
     double module();
+
     double argument();
 
-
-   
     default Complexe add(Complexe c) {
         return new ComplexeCartesien(this.reelle() + c.reelle(), this.imaginaire() + c.imaginaire());
     }

@@ -2,9 +2,9 @@ package tp05.sort;
 
 public class QuickSort implements Sort {
     public int partition(int[] t, int from, int to) {
-        int i = from + 1; // urmatorul element de la start 
+        int i = from + 1;
         for (int j = from + 1; j < to; j++) {
-            if (t[j] < t[from]) { 
+            if (t[j] < t[from]) {
                 ArrayUtil.swap(t, i, j);
                 i += 1;
             }

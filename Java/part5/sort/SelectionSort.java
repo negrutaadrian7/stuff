@@ -2,7 +2,8 @@ package tp05.sort;
 
 public final class SelectionSort implements Sort {
     @Override
-    public void sort(int[] t, int from, int to) {
+    public void sort(int[] t, int from, int to) { // on cherchele plus petit indice et on echange avec la position ou se
+                                                  // trouve l'iterateur actuel
         for (int i = from; i < to - 1; i++) {
             int j = getIndexMin(t, i, to);
             ArrayUtil.swap(t, i, j);

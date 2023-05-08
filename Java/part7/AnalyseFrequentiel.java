@@ -9,7 +9,7 @@ public class AnalyseFrequentiel {
     
     
     public String filepath; 
-    public AnalyseFrequentiel (String filepath) {
+    public AnalyseFrequentiel (String filepath) { // constructeur
         this.filepath = filepath; 
     }
     
@@ -21,6 +21,7 @@ public class AnalyseFrequentiel {
         FileReader reader = new FileReader(f);
         BufferedReader bReader = new BufferedReader(reader);
         String buff = "" ;
+        
         int nbTotalCarac = 0;
 
         buff = bReader.readLine();

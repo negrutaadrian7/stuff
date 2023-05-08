@@ -35,7 +35,7 @@ public class Codeur {
         BufferedReader breader = new BufferedReader(reader);
 
         PrintWriter file_to_write = new PrintWriter(filePath2);
-        Cesar c = new Cesar(key);
+        Cesar c = new Cesar(key); // appel a la classe Cesar
         
         if (codeOuDecode == "code") {
             while (breader.readLine() != null ){

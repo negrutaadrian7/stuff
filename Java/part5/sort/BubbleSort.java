@@ -6,7 +6,7 @@ public class BubbleSort implements Sort {
         boolean hasModification = true;
         for (int i = from; i < to - 1 && hasModification; i++) {
             hasModification = false;
-            for (int j = from; j < to - 1 + from - i; j++) {
+            for (int j = from; j < to - 1 + from - i; j++) { // j will start from the from index everytime
                 if (t[j] > t[j + 1]) {
                     ArrayUtil.swap(t, j, j + 1);
                     hasModification = true;

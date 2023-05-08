@@ -7,46 +7,33 @@ Par ex: addAll(int, List <E>) peut etre deduite de add(int, E) donc on utilise
 add(int, E) pour construire add(int, List<E>)
 */
 
+abstract class AbstractList<E> implements List<E> {
 
-abstract class AbstractList<E> implements List<E>
-{
-    public boolean add (E element)
-    {
-        add(size(), element);
+    public boolean add(E element) { // 1
+        add(size(), element); // appel au add(int indice, E element);
         return true;
     }
 
-
-
-    public boolean addAll(List<? extends E> maListe)
-    {
+    public boolean addAll(List<? extends E> maListe) {
         return addAll(maListe, size()); // implemented later in ArrayList
     }
-    
-    
-    public boolean addAll (List <? extends E> list, int indice)
-    {
+
+    public boolean addAll(List<? extends E> list, int indice) { // ajout de la liste list
         for (int i = 0; i < list.size(); i++) {
             add(indice + i, list.get(i));
         }
-        return !list.isEmpty(); // on sait que si la liste contient des elements, inevitablement on les ajoute 
+        return !list.isEmpty(); // on sait que si la liste contient des elements, inevitablement on les ajoute
 
     }
-    
-    
-    
-    public void clear ()
-    {
-        int size = size ();
+
+    public void clear() {
+        int size = size();
         while (size-- > 0) {
-            remove(0); // on decale a gauche, donc on efface chaque fois l'indice 0 
+            remove(0); // on decale a gauche, donc on efface chaque fois l'indice 0
         }
     }
 
-    
-    
-    public boolean contains(Object object) 
-    {
+    public boolean contains(Object object) {
         for (int i = 0; i < size(); i++) {
             if (Objects.equals(object, get(i))) {
                 return true;
@@ -54,11 +41,10 @@ abstract class AbstractList<E> implements List<E>
         }
         return false;
     }
-    
-    public boolean containsAll (List<?> list) 
-    {
-        for (int i = 0; i < list.size(); i++){
-            if (!contains(list.get(i))){
+
+    public boolean containsAll(List<?> list) { // si tous les elements de la liste list existe
+        for (int i = 0; i < list.size(); i++) {
+            if (!contains(list.get(i))) {
                 return false;
             }
         }
@@ -66,16 +52,14 @@ abstract class AbstractList<E> implements List<E>
 
     }
 
-    public boolean isEmpty ()
-    {
-        return size() == 0; 
+    public boolean isEmpty() {
+        return size() == 0;
     }
 
-    public boolean remove (Object object)
-    {
+    public boolean remove(Object object) {
         boolean hasModified = false;
-        for (int i = 0; i < size(); i++){
-            if (object.equals(get(i))){ // work the same as (==) 
+        for (int i = 0; i < size(); i++) {
+            if (object.equals(get(i))) {
                 remove(i);
                 hasModified = true;
             }
@@ -84,31 +68,27 @@ abstract class AbstractList<E> implements List<E>
         return hasModified;
     }
 
-
     // supprime toutes les occurences des elements d'une liste passe en parametre
 
-    public boolean removeAll (List<?> list) 
-    {
+    public boolean removeAll(List<?> list) {
         boolean hasChanged = false;
         for (int i = 0; i < size(); i++) {
             if (list.contains(get(i))) {
                 remove(i);
                 hasChanged = true;
-            } 
+            }
         }
         return hasChanged;
     }
 
-    public E set(int index, E element) 
-    {
+    public E set(int index, E element) {
         E old = remove(index);
         add(index, element);
         return old;
     }
 
     @Override
-    public String toString() 
-    {
+    public String toString() {
         if (isEmpty()) {
             return "[ ]";
         }
@@ -122,5 +102,5 @@ abstract class AbstractList<E> implements List<E>
         builder.append(']');
         return builder.toString();
     }
-    
+
 }
