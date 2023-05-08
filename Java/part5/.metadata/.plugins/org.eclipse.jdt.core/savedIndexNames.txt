@@ -1,5 +1,0 @@
-INDEX VERSION 1.131+C:\Users\negru\OneDrive\Bureau\uni\COOP\c5\.metadata\.plugins\org.eclipse.jdt.core
-1865797976.index
-3039740755.index
-1372677264.index
-1821021101.index
